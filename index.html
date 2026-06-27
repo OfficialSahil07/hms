@@ -1,187 +1,321 @@
+html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HMS Pro - Hospital Management</title>
-    <!-- Bootstrap 5 -->
+    <title>HMS Pro | Advanced Hospital Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Supabase JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --dark-blue: #002147;
-            --medical-red: #dc3545;
-            --light-bg: #f4f7f6;
-        }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--light-bg); margin: 0; }
-        #login-page { height: 100vh; display: flex; align-items: center; justify-content: center; background-color: var(--dark-blue); }
-        .login-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); width: 400px; }
+        :root { --dark-blue: #002147; --med-blue: #003366; --medical-red: #dc3545; --light-bg: #f8f9fa; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--light-bg); transition: all 0.3s; }
+        
+        /* Auth Page */
+        #login-page { height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--dark-blue) 0%, #000 100%); }
+        .login-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); width: 420px; }
+
+        /* Dashboard Layout */
         #dashboard-page { display: none; }
-        .sidebar { height: 100vh; width: 260px; position: fixed; background-color: var(--dark-blue); color: white; }
-        .sidebar .nav-link { color: #d1d1d1; padding: 15px 25px; border-bottom: 1px solid #003366; text-decoration: none; display: block; }
+        .sidebar { height: 100vh; width: 260px; position: fixed; background-color: var(--dark-blue); color: white; transition: 0.3s; }
+        .sidebar .nav-link { color: #bcc6d2; padding: 12px 20px; border-radius: 8px; margin: 5px 15px; text-decoration: none; display: flex; align-items: center; transition: 0.2s; }
+        .sidebar .nav-link i { width: 25px; }
         .sidebar .nav-link:hover, .sidebar .nav-link.active { background-color: var(--medical-red); color: white; }
-        .main-content { margin-left: 260px; padding: 20px; }
-        .top-nav { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .stat-card { background: white; border-left: 5px solid var(--medical-red); padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .btn-red { background-color: var(--medical-red); color: white; border: none; }
-        .btn-red:hover { background-color: #b02a37; color: white; }
+        
+        .main-content { margin-left: 260px; padding: 0; }
+        .top-nav { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 15px rgba(0,0,0,0.05); }
+        
+        .page-wrapper { padding: 30px; }
+        .stat-card { background: white; border: none; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 5px solid var(--medical-red); transition: 0.3s; }
+        .stat-card:hover { transform: translateY(-5px); }
+        
+        .btn-primary-custom { background-color: var(--dark-blue); color: white; border: none; transition: 0.3s; }
+        .btn-primary-custom:hover { background-color: var(--med-blue); color: white; }
+        .btn-danger-custom { background-color: var(--medical-red); color: white; border: none; }
+        
+        .table-card { background: white; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; }
+        .table-card .card-header { background: white; border-bottom: 1px solid #eee; padding: 20px; }
     </style>
 </head>
 <body>
 
-    <!-- LOGIN PAGE -->
+    <!-- LOGIN SECTION -->
     <div id="login-page">
         <div class="login-card">
-            <h2 class="text-center" style="color: var(--dark-blue)">🏥 HMS Pro</h2>
-            <p class="text-center text-muted">Login to Manage Hospital</p>
-            <div class="mb-3">
-                <label>Email</label>
-                <input type="email" id="email" class="form-control" placeholder="admin@hospital.com">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold" style="color: var(--dark-blue)">🏥 HMS Pro</h2>
+                <p class="text-muted">Enterprise Hospital Suite</p>
             </div>
             <div class="mb-3">
-                <label>Password</label>
-                <input type="password" id="password" class="form-control" placeholder="••••••••">
+                <label class="form-label">Email Address</label>
+                <input type="email" id="email" class="form-control form-control-lg" placeholder="admin@hospital.com">
             </div>
-            <button id="loginBtn" class="btn btn-red w-100">Login</button>
-            <p id="login-error" class="text-danger text-center mt-3" style="display:none">Invalid credentials!</p>
+            <div class="mb-4">
+                <label class="form-label">Password</label>
+                <input type="password" id="password" class="form-control form-control-lg" placeholder="••••••••">
+            </div>
+            <button id="loginBtn" class="btn btn-danger-custom w-100 py-2 fw-bold">SIGN IN</button>
+            <div id="login-error" class="alert alert-danger mt-3 text-center" style="display:none">Invalid credentials!</div>
         </div>
     </div>
 
-    <!-- DASHBOARD PAGE -->
+    <!-- MAIN DASHBOARD -->
     <div id="dashboard-page">
         <div class="sidebar">
             <div class="p-4 text-center">
-                <h4 class="text-white">🏥 HMS Pro</h4>
-                <hr class="text-white">
+                <h4 class="text-white fw-bold">🏥 HMS Pro</h4>
+                <small class="text-muted">Admin Panel v1.0</small>
             </div>
-            <nav class="nav flex-column">
-                <a class="nav-link active" href="#" onclick="showSection('home')">📊 Dashboard</a>
-                <a class="nav-link" href="#" onclick="showSection('patients')">👥 Patients</a>
-                <a class="nav-link" href="#" onclick="showSection('doctors')">👨‍⚕️ Doctors</a>
-                <a class="nav-link" href="#" onclick="logout()" style="color: #ff8080;">🚪 Logout</a>
+            <nav class="nav flex-column mt-4">
+                <a class="nav-link active" href="#" onclick="showSection('home')"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+                <a class="nav-link" href="#" onclick="showSection('patients')"><i class="fa-solid fa-user-injured"></i> Patients</a>
+                <a class="nav-link" href="#" onclick="showSection('doctors')"><i class="fa-solid fa-user-doctor"></i> Doctors</a>
+                <a class="nav-link" href="#" onclick="showSection('appointments')"><i class="fa-solid fa-calendar-check"></i> Appointments</a>
+                <div class="mt-5"></div>
+                <a class="nav-link text-danger" href="#" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
             </nav>
         </div>
 
         <div class="main-content">
             <div class="top-nav">
-                <h5 id="page-title">Admin Dashboard</h5>
-                <div>
-                    <span id="user-name">Welcome, Admin</span>
-                    <img src="https://ui-avatars.com/api/?name=Admin&background=002147&color=fff" class="rounded-circle ms-2" width="40">
+                <h5 id="page-title" class="fw-bold m-0">Dashboard Overview</h5>
+                <div class="d-flex align-items-center">
+                    <span class="me-3 fw-semibold">Admin System</span>
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=002147&color=fff" class="rounded-circle" width="40">
                 </div>
             </div>
 
-            <div id="section-home">
-                <div class="row g-3">
-                    <div class="col-md-3"><div class="stat-card"><h6 class="text-muted">Total Patients</h6><h3 id="count-patients">Loading...</h3></div></div>
-                    <div class="col-md-3"><div class="stat-card"><h6 class="text-muted">Active Doctors</h6><h3 id="count-doctors">Loading...</h3></div></div>
-                    <div class="col-md-3"><div class="stat-card"><h6 class="text-muted">Appointments</h6><h3 id="count-apps">Loading...</h3></div></div>
-                    <div class="col-md-3"><div class="stat-card"><h6 class="text-muted">Revenue</h6><h3 id="count-rev">$0</h3></div></div>
+            <div class="page-wrapper">
+                <!-- HOME SECTION -->
+                <div id="section-home">
+                    <div class="row g-4 mb-5">
+                        <div class="col-md-3">
+                            <div class="card stat-card p-4">
+                                <div class="d-flex justify-content-between">
+                                    <div><h6 class="text-muted">Total Patients</h6><h3 id="count-patients" class="fw-bold">0</h3></div>
+                                    <i class="fa-solid fa-users fa-2x text-secondary opacity-50"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stat-card p-4">
+                                <div class="d-flex justify-content-between">
+                                    <div><h6 class="text-muted">Active Doctors</h6><h3 id="count-doctors" class="fw-bold">0</h3></div>
+                                    <i class="fa-solid fa-stethoscope fa-2x text-secondary opacity-50"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stat-card p-4">
+                                <div class="d-flex justify-content-between">
+                                    <div><h6 class="text-muted">Appointments</h6><h3 id="count-apps" class="fw-bold">0</h3></div>
+                                    <i class="fa-solid fa-calendar-days fa-2x text-secondary opacity-50"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stat-card p-4">
+                                <div class="d-flex justify-content-between">
+                                    <div><h6 class="text-muted">Revenue</h6><h3 id="count-rev" class="fw-bold">$0</h3></div>
+                                    <i class="fa-solid fa-money-bill-trend-up fa-2x text-secondary opacity-50"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="m-0 fw-bold">Latest Patient Admissions</h5>
+                            <button class="btn btn-primary-custom btn-sm" onclick="showSection('patients')">View All</button>
+                        </div>
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light"><tr><th>ID</th><th>Name</th><th>Email</th><th>Status</th></tr></thead>
+                            <tbody id="recent-patients-list"></tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="mt-4 card p-3 shadow-sm">
-                    <h5 class="fw-bold">Recent Patients</h5>
-                    <table class="table table-hover mt-3">
-                        <thead class="table-light"><tr><th>ID</th><th>Name</th><th>Email</th></tr></thead>
-                        <tbody id="patient-list"></tbody>
-                    </table>
-                </div>
-            </div>
 
-            <div id="section-patients" style="display:none">
-                <h3 class="fw-bold">Patient Management</h3>
-                <div class="card p-3 shadow-sm">
-                    <table class="table">
-                        <thead><tr><th>ID</th><th>Name</th><th>Email</th></tr></thead>
-                        <tbody id="patient-list-full"></tbody>
-                    </table>
+                <!-- PATIENTS SECTION -->
+                <div id="section-patients" style="display:none">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3>Patient Directory</h3>
+                        <button class="btn btn-primary-custom" data-bs-toggle="modal" data-bs-target="#patientModal">+ Add Patient</button>
+                    </div>
+                    <div class="table-card">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light"><tr><th>ID</th><th>Full Name</th><th>Email</th><th>Gender</th><th>Action</th></tr></thead>
+                            <tbody id="full-patient-list"></tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
 
-            <div id="section-doctors" style="display:none">
-                <h3 class="fw-bold">Doctor Management</h3>
-                <div class="card p-3 shadow-sm">
-                    <table class="table">
-                        <thead><tr><th>ID</th><th>Specialization</th><th>Fee</th></tr></thead>
-                        <tbody id="doctor-list"></tbody>
-                    </table>
+                <!-- DOCTORS SECTION -->
+                <div id="section-doctors" style="display:none">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3>Medical Staff</h3>
+                        <button class="btn btn-primary-custom" data-bs-toggle="modal" data-bs-target="#doctorModal">+ Add Doctor</button>
+                    </div>
+                    <div class="table-card">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light"><tr><th>ID</th><th>Specialization</th><th>Fee</th><th>Experience</th><th>Action</th></tr></thead>
+                            <tbody id="full-doctor-list"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- APPOINTMENTS SECTION -->
+                <div id="section-appointments" style="display:none">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3>Appointment Scheduler</h3>
+                        <button class="btn btn-primary-custom" data-bs-toggle="modal" data-bs-target="#appModal">+ Book Appointment</button>
+                    </div>
+                    <div class="table-card">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light"><tr><th>ID</th><th>Patient ID</th><th>Doctor ID</th><th>Date</th><th>Status</th></tr></thead>
+                            <tbody id="full-app-list"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- MODALS -->
+    <!-- Patient Modal -->
+    <div class="modal fade" id="patientModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"><h5>Add New Patient</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <div class="mb-3"><label>Full Name</label><input type="text" id="p-name" class="form-control"></div>
+                    <div class="mb-3"><label>Email</label><input type="email" id="p-email" class="form-control"></div>
+                    <div class="mb-3"><label>Gender</label><select id="p-gender" class="form-select"><option>Male</option><option>Female</option><option>Other</option></select></div>
+                    <button onclick="savePatient()" class="btn btn-primary-custom w-100">Save Patient</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doctor Modal -->
+    <div class="modal fade" id="doctorModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"><h5>Add New Doctor</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <div class="mb-3"><label>Specialization</label><input type="text" id="d-spec" class="form-control"></div>
+                    <div class="mb-3"><label>Consultation Fee</label><input type="number" id="d-fee" class="form-control"></div>
+                    <div class="mb-3"><label>Experience (Years)</label><input type="number" id="d-exp" class="form-control"></div>
+                    <button onclick="saveDoctor()" class="btn btn-primary-custom w-100">Save Doctor</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointment Modal -->
+    <div class="modal fade" id="appModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"><h5>Book Appointment</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <div class="mb-3"><label>Patient ID</label><input type="number" id="a-pid" class="form-control"></div>
+                    <div class="mb-3"><label>Doctor ID</label><input type="number" id="a-did" class="form-control"></div>
+                    <div class="mb-3"><label>Date</label><input type="date" id="a-date" class="form-control"></div>
+                    <div class="mb-3"><label>Time</label><input type="time" id="a-time" class="form-control"></div>
+                    <button onclick="saveApp()" class="btn btn-primary-custom w-100">Book Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // 1. CONFIGURATION (SURE YOU REPLACE THESE!)
+        // CONFIGURATION
         const SB_URL = 'https://ccfauxnhvwafwjghouyt.supabase.co'; 
         const SB_KEY = 'sb_publishable_X2s1waweyF_VJwLcTm0KEw_QUlLBm7u';
-        
-        // Initialize Supabase
         const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 
-        // 2. LOGIN FUNCTION
+        // AUTH
         async function handleLogin() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-
-            if(!email || !password) {
-                alert("Please enter both email and password");
-                return;
-            }
-
-            const { data, error } = await supabaseClient.auth.signInWithPassword({
-                email: email,
-                password: password,
-            });
-
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
             if (error) {
                 document.getElementById('login-error').style.display = 'block';
-                console.error("Login Error:", error.message);
             } else {
                 document.getElementById('login-page').style.display = 'none';
                 document.getElementById('dashboard-page').style.display = 'block';
-                loadDashboardData();
+                initData();
             }
         }
-
-        // Attach function to button
         document.getElementById('loginBtn').addEventListener('click', handleLogin);
 
-        // 3. NAVIGATION
+        // ROUTING
         function showSection(section) {
-            document.getElementById('section-home').style.display = 'none';
-            document.getElementById('section-patients').style.display = 'none';
-            document.getElementById('section-doctors').style.display = 'none';
-            document.getElementById('section-' + section).style.display = 'block';
-            document.getElementById('page-title').innerText = section.toUpperCase() + " Dashboard";
+            ['home', 'patients', 'doctors', 'appointments'].forEach(s => {
+                document.getElementById('section-' + s).style.display = (s === section) ? 'block' : 'none';
+            });
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            document.getElementById('page-title').innerText = section.charAt(0).toUpperCase() + section.slice(1) + " Management";
         }
 
-        // 4. DATA LOADING
-        async function loadDashboardData() {
-            try {
-                // Patients Count
-                const { count: pCount } = await supabaseClient.from('patients').select('*', { count: 'exact', head: true });
-                document.getElementById('count-patients').innerText = pCount || 0;
+        // DATA OPERATIONS
+        async function initData() {
+            loadStats();
+            loadPatients();
+            loadDoctors();
+            loadAppointments();
+        }
 
-                // Doctors Count
-                const { count: dCount } = await supabaseClient.from('doctors').select('*', { count: 'exact', head: true });
-                document.getElementById('count-doctors').innerText = dCount || 0;
+        async function loadStats() {
+            const { count: pC } = await supabaseClient.from('patients').select('*', { count: 'exact', head: true });
+            const { count: dC } = await supabaseClient.from('doctors').select('*', { count: 'exact', head: true });
+            const { count: aC } = await supabaseClient.from('appointments').select('*', { count: 'exact', head: true });
+            document.getElementById('count-patients').innerText = pC || 0;
+            document.getElementById('count-doctors').innerText = dC || 0;
+            document.getElementById('count-apps').innerText = aC || 0;
+        }
 
-                // Fetch Patients List
-                const { data: patients } = await supabaseClient.from('patients').select('*');
-                const pList = document.getElementById('patient-list');
-                const pListFull = document.getElementById('patient-list-full');
-                
-                const html = patients.map(p => `<tr><td>p.id</td><td>{p.id}</td><td>p.id</td><td>{p.full_name}</td><td>${p.email}</td></tr>`).join('');
-                pList.innerHTML = html;
-                if(pListFull) pListFull.innerHTML = html;
+        async function loadPatients() {
+            const { data } = await supabaseClient.from('patients').select('*').order('id', {ascending: false});
+            const rows = data.map(p => `<tr><td>${p.id}</td><td>${p.full_name}</td><td>${p.email}</td><td>${p.gender}</td><td><button class="btn btn-sm btn-outline-danger" onclick="deleteItem('patients', ${p.id})">Delete</button></td></tr>`).join('');
+            document.getElementById('full-patient-list').innerHTML = rows;
+            document.getElementById('recent-patients-list').innerHTML = rows.split('</tr>').slice(0, 5).join('') + '</tr>';
+        }
 
-                // Fetch Doctors List
-                const { data: doctors } = await supabaseClient.from('doctors').select('*');
-                const dList = document.getElementById('doctor-list');
-                dList.innerHTML = doctors.map(d => `<tr><td>d.id</td><td>{d.id}</td><td>d.id</td><td>{d.specialization}</td><td>$${d.consultation_fee}</td></tr>`).join('');
+        async function loadDoctors() {
+            const { data } = await supabaseClient.from('doctors').select('*');
+            document.getElementById('full-doctor-list').innerHTML = data.map(d => `<tr><td>${d.id}</td><td>${d.specialization}</td><td>$${d.consultation_fee}</td><td>${d.experience_years}yrs</td><td><button class="btn btn-sm btn-outline-danger" onclick="deleteItem('doctors', ${d.id})">Delete</button></td></tr>`).join('');
+        }
 
-            } catch (err) {
-                console.error("Data load error:", err);
+        async function loadAppointments() {
+            const { data } = await supabaseClient.from('appointments').select('*');
+            document.getElementById('full-app-list').innerHTML = data.map(a => `<tr><td>${a.id}</td><td>${a.patient_id}</td><td>${a.doctor_id}</td><td>${a.appointment_date}</td><td>${a.status}</td></tr>`).join('');
+        }
+
+        // CRUD ACTIONS
+        async function savePatient() {
+            await supabaseClient.from('patients').insert([{ full_name: document.getElementById('p-name').value, email: document.getElementById('p-email').value, gender: document.getElementById('p-gender').value }]);
+            bootstrap.Modal.getInstance(document.getElementById('patientModal')).hide();
+            initData();
+        }
+
+        async function saveDoctor() {
+            await supabaseClient.from('doctors').insert([{ specialization: document.getElementById('d-spec').value, consultation_fee: document.getElementById('d-fee').value, experience_years: document.getElementById('d-exp').value }]);
+            bootstrap.Modal.getInstance(document.getElementById('doctorModal')).hide();
+            initData();
+        }
+
+        async function saveApp() {
+            await supabaseClient.from('appointments').insert([{ patient_id: document.getElementById('a-pid').value, doctor_id: document.getElementById('a-did').value, appointment_date: document.getElementById('a-date').value, appointment_time: document.getElementById('a-time').value }]);
+            bootstrap.Modal.getInstance(document.getElementById('appModal')).hide();
+            initData();
+        }
+
+        async function deleteItem(table, id) {
+            if(confirm('Are you sure?')) {
+                await supabaseClient.from(table).delete().eq('id', id);
+                initData();
             }
         }
 
